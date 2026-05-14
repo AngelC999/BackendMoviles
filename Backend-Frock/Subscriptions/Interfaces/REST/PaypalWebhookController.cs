@@ -1,10 +1,11 @@
 ﻿using System.Text.Json;
 using Backend_Frock.Subscriptions.Domain.Service;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.AspNetCore.Authorization;
 namespace Backend_Frock.Subscriptions.Interfaces.REST;
 
 [ApiController]
+[AllowAnonymous]
 [Route("api/v1/paypal/webhooks")]
 public class PaypalWebhookController(
     ISubscriptionCommandService commandService,
