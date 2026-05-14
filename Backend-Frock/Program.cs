@@ -251,7 +251,24 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var seeder = services.GetRequiredService<GeographicDataSeeder>();
-        await seeder.SeedDataAsync();
+
+        for (var i = 1; i <= 3; i++)
+        {
+            try
+            {
+                await seeder.SeedDataAsync();
+                break;
+            }
+            catch (Exception ex)
+            {
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "Error cargando datos geográficos. Intento {Attempt}/3", i);
+
+                if (i == 3) throw;
+
+                await Task.Delay(5000);
+            }
+        }
     }
     catch (Exception ex)
     {
