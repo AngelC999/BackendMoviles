@@ -118,24 +118,14 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Obtener conexión del appsettings.json o de variables de entorno de Railway
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-// Si estamos en Railway, construimos la cadena con variables internas para mayor velocidad
-if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("MYSQLHOST")))
-{
-    var host = Environment.GetEnvironmentVariable("MYSQLHOST");
-    var port = Environment.GetEnvironmentVariable("MYSQLPORT");
-    var user = Environment.GetEnvironmentVariable("MYSQLUSER");
-    var pass = Environment.GetEnvironmentVariable("MYSQLPASSWORD");
-    var db   = Environment.GetEnvironmentVariable("MYSQLDATABASE");
-
-    connectionString = $"Server={host};Port={port};Database={db};Uid={user};Pwd={pass};SslMode=Required;";
-}
+// Obtener conexión desde Render/Railway
+var connectionString =
+    Environment.GetEnvironmentVariable("MYSQL_URL")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (connectionString is null)
 {
-    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+    throw new InvalidOperationException("Connection string not found.");
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
